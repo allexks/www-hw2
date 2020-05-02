@@ -57,10 +57,73 @@ if (isset($_POST["submit"])) {
         }
     }
 
+    $db = null;
+
     if (empty($errors)) {
+        $db_host = SETTINGS["DATABASE_HOST"];
+        $db_user = SETTINGS["DATABASE_USER"];
+        $db_pass = SETTINGS["DATABASE_PASSWORD"];
+        $db_name = SETTINGS["DATABASE_NAME"];
 
-        // TODO: save into database
+        try {
+            $db = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8", $db_user, $db_pass);
+        } catch (PDOException $exception) {
+            error_log("[!!] FATAL: Database connection unsucessful: " . $exception->getMessage());
+            $errors[] = "Изникна ни проблем. Пробвайте пак по-късно.";
+        }
+    }
 
+    if (empty($errors) && isset($db)) {
+        $qry = "INSERT INTO users (
+                    first_name,
+                    family_name,
+                    academic_year,
+                    major,
+                    fn,
+                    major_group,
+                    birth,
+                    zodiac_sign,
+                    hyperlink,
+                    photo_filepath,
+                    motivation
+                ) VALUES (
+                    :firstname,
+                    :familyname,
+                    :year,
+                    :major,
+                    :fn,
+                    :majorgroup,
+                    :birth,
+                    :zodiac,
+                    :hyperlink,
+                    :photo,
+                    :motivation
+                )";
+
+        $stmt = $db->prepare($qry);
+
+        $stmt->bindParam(":firstname", $field_values[FIRSTNAME_FIELDNAME]);
+        $stmt->bindParam(":familyname", $field_values[FAMILYNAME_FIELDNAME]);
+        $stmt->bindParam(":year", $field_values[ACADEMIC_YEAR_FIELDNAME]);
+        $stmt->bindParam(":major", $field_values[MAJOR_FIELDNAME]);
+        $stmt->bindParam(":fn", $field_values[FN_FIELDNAME]);
+        $stmt->bindParam(":majorgroup", $field_values[MAJORGROUP_FIELDNAME]);
+        $stmt->bindParam(":birth", $field_values[BIRTHDATE_FIELDNAME]);
+        $zodiac = "LIBRA";  // TODO
+        $stmt->bindParam(":zodiac", $zodiac);
+        $stmt->bindParam(":hyperlink", $field_values[LINK_FIELDNAME]);
+        $photo = "test.png"; // TODO
+        $stmt->bindParam(":photo", $photo);
+        $motivation = "none"; // TODO
+        $stmt->bindParam(":motivation", $motivation);
+
+        if (!$stmt->execute()) {
+            error_log("[!!] CRITICAL: Database query unsucessful: " . $stmt->errorInfo()[2]);
+            $errors[] = "Изникна ни проблем със заявката. Пробвайте пак по-късно.";
+        }
+    }
+
+    if (empty($errors)) {
         header("Location: success.php");
     }
 }

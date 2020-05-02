@@ -8,9 +8,17 @@
         <div class="container">
             <form action="" method="post" enctype="multipart/form-data">
                 <legend>Пусни своята заявка</legend>
-                <input type="text" name="firstname" placeholder="Собствено име" value="<?=$field_values["firstname"]?>"/>
-                <input type="text" name="familyname" placeholder="Фамилно име" value="<?=$field_values["familyname"]?>"/>
-                <!-- TODO -->
+                <input type="text" name="<?=FIRSTNAME_FIELDNAME?>" placeholder="Собствено име" value="<?=$field_values[FIRSTNAME_FIELDNAME]?>" />
+                <input type="text" name="<?=FAMILYNAME_FIELDNAME?>" placeholder="Фамилно име" value="<?=$field_values[FAMILYNAME_FIELDNAME]?>" />
+                <input type="text" name="<?=FN_FIELDNAME?>" placeholder="Факултетен номер" value="<?=$field_values[FN_FIELDNAME]?>" />
+                <input type="text" name="<?=MAJOR_FIELDNAME?>" placeholder="Специалност" value="<?=$field_values[MAJOR_FIELDNAME]?>" />
+                <input type="text" name="<?=ACADEMIC_YEAR_FIELDNAME?>" placeholder="Курс" value="<?=$field_values[ACADEMIC_YEAR_FIELDNAME]?>" />
+                <input type="text" name="<?=MAJORGROUP_FIELDNAME?>" placeholder="Група" value="<?=$field_values[MAJORGROUP_FIELDNAME]?>" />
+                <input type="text" name="<?=BIRTHDATE_FIELDNAME?>" placeholder="Дата на раждане (ГГГГ-ММ-ДД)" value="<?=$field_values[BIRTHDATE_FIELDNAME]?>" />
+                <input type="text" id="zodiac_sign" placeholder="Зодиакален знак" readonly />
+                <input type="text" name="<?=LINK_FIELDNAME?>" placeholder="Линк (към уебсайт, блог, профил, т.н.)" value="<?=$field_values[LINK_FIELDNAME]?>" />
+                <!-- TODO: photo -->
+                <!-- TODO: motivation -->
                 <input type="submit" name="submit" value="Кандидатствай сега!" />
             </form>
             <p class="error"><?=$error_html?></p>

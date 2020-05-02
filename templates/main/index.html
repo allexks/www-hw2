@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>62136 Alexander Ignatov</title>
+    </head>
+    <body>
+        <div class="container">
+            <form action="" method="post" enctype="multipart/form-data">
+                <legend>Пусни своята заявка</legend>
+                <input type="text" name="firstname" placeholder="Собствено име" value="<?=$field_values["firstname"]?>"/>
+                <input type="text" name="familyname" placeholder="Фамилно име" value="<?=$field_values["familyname"]?>"/>
+                <!-- TODO -->
+                <input type="submit" name="submit" value="Кандидатствай сега!" />
+            </form>
+            <p class="error"><?=$error_html?></p>
+        </div>
+    </body>
+</html>

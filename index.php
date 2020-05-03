@@ -11,6 +11,7 @@ define("MAJORGROUP_FIELDNAME", "major_group");
 define("BIRTHDATE_FIELDNAME", "birth_date");
 define("LINK_FIELDNAME", "hyperlink");
 define("MOTIVATION_FIELDNAME", "motivation");
+define("ZODIAC_FIELDNAME", "zodiac"); // WARNING: should never be input by user
 
 $errors = [];
 
@@ -24,6 +25,21 @@ $field_values = [
     BIRTHDATE_FIELDNAME => "",
     LINK_FIELDNAME => "",
     MOTIVATION_FIELDNAME => "",
+];
+
+$ZODIAC_TRANSLATIONS = [
+    "AQUARIUS" => "Водолей",
+    "PISCES" => "Риби",
+    "ARIES" => "Овен",
+    "TAURUS" => "Телец",
+    "GEMINI" => "Близнаци",
+    "CANCER" => "Рак",
+    "LEO" => "Лъв",
+    "VIRGO" => "Дева",
+    "LIBRA" => "Везни",
+    "SCORPIO" => "Скорпион",
+    "SAGITTARIUS" => "Стрелец",
+    "CAPRICORN" => "Козирог",
 ];
 
 function empty_field_error_message($field) {
@@ -49,6 +65,40 @@ function empty_field_error_message($field) {
     }
 }
 
+function zodiacForDate($datestr) {
+    $ymd = explode("-", $datestr);  // assuming YYYY-MM-DD format
+    $m = (int)$ymd[1];
+    $d = (int)$ymd[2];
+
+    if ($m == 1 && ($d >= 20 && $d <= 31) || $m == 2 && ($d >= 1 && $d <= 18)) {
+        return "AQUARIUS";
+    } else if ($m == 2 && ($d >= 19 && $d <= 29) || $m == 3 && ($d >= 1 && $d <= 20)) {
+        return "PISCES";
+    } else if ($m == 3 && ($d >= 21 && $d <= 31) || $m == 4 && ($d >= 1 && $d <= 19)) {
+        return "ARIES";
+    } else if ($m == 4 && ($d >= 20 && $d <= 30) || $m == 5 && ($d >= 1 && $d <= 20)) {
+        return "TAURUS";
+    } else if ($m == 5 && ($d >= 21 && $d <= 31) || $m == 6 && ($d >= 1 && $d <= 21)) {
+        return "GEMINI";
+    } else if ($m == 6 && ($d >= 22 && $d <= 30) || $m == 7 && ($d >= 1 && $d <= 22)) {
+        return "CANCER";
+    } else if ($m == 7 && ($d >= 23 && $d <= 31) || $m == 8 && ($d >= 1 && $d <= 22)) {
+        return "LEO";
+    } else if ($m == 8 && ($d >= 23 && $d <= 31) || $m == 9 && ($d >= 1 && $d <= 22)) {
+        return "VIRGO";
+    } else if ($m == 9 && ($d >= 23 && $d <= 30) || $m == 10 && ($d >= 1 && $d <= 22)) {
+        return "LIBRA";
+    } else if ($m == 10 && ($d >= 23 && $d <= 31) || $m == 11 && ($d >= 1 && $d <= 21)) {
+        return "SCORPIO";
+    } else if ($m == 11 && ($d >= 22 && $d <= 30) || $m == 12 && ($d >= 1 && $d <= 21)) {
+        return "SAGITTARIUS";
+    } else if ($m == 12 && ($d >= 22 && $d <= 31) || $m == 1 && ($d >= 1 && $d <= 19)) {
+        return "CAPRICORN";
+    } else {
+        return false;
+    }
+}
+
 if (isset($_POST["submit"])) {
 
     foreach ($field_values as $field_name => $field_default_value) {
@@ -58,6 +108,22 @@ if (isset($_POST["submit"])) {
             $errors[] = empty_field_error_message($field_name);
         } else {
             $field_values[$field_name] = $value;
+        }
+
+        switch ($field_name) {
+            case BIRTHDATE_FIELDNAME:
+                if (!preg_match("/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}$/", $value)) {
+                    $errors[] = "Моля въведете правилна дата във формат ГГГГ-ММ-ДД!";
+                } else {
+                    $field_values[ZODIAC_FIELDNAME] = zodiacForDate($value);
+
+                    if (!$field_values[ZODIAC_FIELDNAME]) {
+                        $errors[] = "Моля въведете валидна дата!";
+                    }
+                }
+
+
+                break;
         }
     }
 
@@ -113,8 +179,7 @@ if (isset($_POST["submit"])) {
         $stmt->bindParam(":fn", $field_values[FN_FIELDNAME]);
         $stmt->bindParam(":majorgroup", $field_values[MAJORGROUP_FIELDNAME]);
         $stmt->bindParam(":birth", $field_values[BIRTHDATE_FIELDNAME]);
-        $zodiac = "LIBRA";  // TODO
-        $stmt->bindParam(":zodiac", $zodiac);
+        $stmt->bindParam(":zodiac", $field_values[ZODIAC_FIELDNAME]);
         $stmt->bindParam(":hyperlink", $field_values[LINK_FIELDNAME]);
         $photo = "test.png"; // TODO
         $stmt->bindParam(":photo", $photo);
@@ -129,6 +194,10 @@ if (isset($_POST["submit"])) {
     if (empty($errors)) {
         header("Location: success.php");
     }
+}
+
+if (isset($field_values[ZODIAC_FIELDNAME])) {
+    $field_values[ZODIAC_FIELDNAME] = $ZODIAC_TRANSLATIONS[$field_values[ZODIAC_FIELDNAME]];
 }
 
 $error_html = implode("<br />", $errors);

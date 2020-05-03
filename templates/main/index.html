@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
+        <meta charset="utf-8" />
         <title>62136 Alexander Ignatov</title>
+        <script src="js/main.js" defer></script>
     </head>
     <body>
         <div class="container">
@@ -14,7 +15,7 @@
                 <input type="text" name="<?=MAJOR_FIELDNAME?>" placeholder="Специалност" value="<?=$field_values[MAJOR_FIELDNAME]?>" />
                 <input type="text" name="<?=ACADEMIC_YEAR_FIELDNAME?>" placeholder="Курс" value="<?=$field_values[ACADEMIC_YEAR_FIELDNAME]?>" />
                 <input type="text" name="<?=MAJORGROUP_FIELDNAME?>" placeholder="Група" value="<?=$field_values[MAJORGROUP_FIELDNAME]?>" />
-                <input type="text" name="<?=BIRTHDATE_FIELDNAME?>" placeholder="Дата на раждане (ГГГГ-ММ-ДД)" value="<?=$field_values[BIRTHDATE_FIELDNAME]?>" />
+                <input type="text" id="birthdate" name="<?=BIRTHDATE_FIELDNAME?>" placeholder="Дата на раждане (ГГГГ-ММ-ДД)" value="<?=$field_values[BIRTHDATE_FIELDNAME]?>" />
                 <input type="text" id="zodiac_sign" placeholder="Зодиакален знак" readonly />
                 <input type="text" name="<?=LINK_FIELDNAME?>" placeholder="Линк (към уебсайт, блог, профил, т.н.)" value="<?=$field_values[LINK_FIELDNAME]?>" />
                 <!-- TODO: photo -->

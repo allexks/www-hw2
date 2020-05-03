@@ -10,6 +10,7 @@ define("FN_FIELDNAME", "faculty_number");
 define("MAJORGROUP_FIELDNAME", "major_group");
 define("BIRTHDATE_FIELDNAME", "birth_date");
 define("LINK_FIELDNAME", "hyperlink");
+define("MOTIVATION_FIELDNAME", "motivation");
 
 $errors = [];
 
@@ -22,6 +23,7 @@ $field_values = [
     MAJORGROUP_FIELDNAME => "",
     BIRTHDATE_FIELDNAME => "",
     LINK_FIELDNAME => "",
+    MOTIVATION_FIELDNAME => "",
 ];
 
 function empty_field_error_message($field) {
@@ -42,6 +44,8 @@ function empty_field_error_message($field) {
             return "Моля попълнете датата си на раждане!";
         case LINK_FIELDNAME:
             return "Моля оставете ваш линк към личен уебсайт, блог или профил в социална мрежа!";
+        case MOTIVATION_FIELDNAME:
+            return "Моля напишете своята мотивация за кандидатстването!";
     }
 }
 
@@ -114,8 +118,7 @@ if (isset($_POST["submit"])) {
         $stmt->bindParam(":hyperlink", $field_values[LINK_FIELDNAME]);
         $photo = "test.png"; // TODO
         $stmt->bindParam(":photo", $photo);
-        $motivation = "none"; // TODO
-        $stmt->bindParam(":motivation", $motivation);
+        $stmt->bindParam(":motivation", $field_values[MOTIVATION_FIELDNAME]);
 
         if (!$stmt->execute()) {
             error_log("[!!] CRITICAL: Database query unsucessful: " . $stmt->errorInfo()[2]);

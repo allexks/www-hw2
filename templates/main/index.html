@@ -18,7 +18,7 @@
                 <input type="text" id="zodiac_sign" placeholder="Зодиакален знак" readonly />
                 <input type="text" name="<?=LINK_FIELDNAME?>" placeholder="Линк (към уебсайт, блог, профил, т.н.)" value="<?=$field_values[LINK_FIELDNAME]?>" />
                 <!-- TODO: photo -->
-                <!-- TODO: motivation -->
+                <textarea name="<?=MOTIVATION_FIELDNAME?>" rows="8" cols="80" ><?=$field_values[MOTIVATION_FIELDNAME]?></textarea>
                 <input type="submit" name="submit" value="Кандидатствай сега!" />
             </form>
             <p class="error"><?=$error_html?></p>

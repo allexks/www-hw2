@@ -12,6 +12,7 @@ define("BIRTHDATE_FIELDNAME", "birth_date");
 define("LINK_FIELDNAME", "hyperlink");
 define("MOTIVATION_FIELDNAME", "motivation");
 define("ZODIAC_FIELDNAME", "zodiac"); // WARNING: should never be input by user
+define("PHOTO_FIELDNAME", "photo");
 
 $errors = [];
 
@@ -25,6 +26,7 @@ $field_values = [
     BIRTHDATE_FIELDNAME => "",
     LINK_FIELDNAME => "",
     MOTIVATION_FIELDNAME => "",
+    PHOTO_FIELDNAME => "",
 ];
 
 $ZODIAC_TRANSLATIONS = [
@@ -62,6 +64,8 @@ function empty_field_error_message($field) {
             return "Моля оставете ваш линк към личен уебсайт, блог или профил в социална мрежа!";
         case MOTIVATION_FIELDNAME:
             return "Моля напишете своята мотивация за кандидатстването!";
+        case PHOTO_FIELDNAME:
+            return "Моля прикачете своя снимка!";
     }
 }
 
@@ -121,8 +125,25 @@ if (isset($_POST["submit"])) {
                         $errors[] = "Моля въведете валидна дата!";
                     }
                 }
-
-
+                break;
+            case ACADEMIC_YEAR_FIELDNAME:
+                $yearInt = (int)$value;
+                if (!$yearInt) {
+                    $errors[] = "Моля въведете цифра, съответстваща на академичната ви година!";
+                } else {
+                    $field_values[ACADEMIC_YEAR_FIELDNAME] = $yearInt;
+                }
+                break;
+            case MAJORGROUP_FIELDNAME:
+                $groupInt = (int)$value;
+                if (!$groupInt) {
+                    $errors[] = "Моля въведете цифра, съответстваща на вашата група!";
+                } else {
+                    $field_values[MAJORGROUP_FIELDNAME] = $groupInt;
+                }
+                break;
+            case PHOTO_FIELDNAME:
+                // TODO
                 break;
         }
     }

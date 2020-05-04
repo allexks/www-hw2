@@ -44,7 +44,7 @@ $ZODIAC_TRANSLATIONS = [
     "CAPRICORN" => "Козирог",
 ];
 
-function empty_field_error_message($field) {
+function emptyFieldErrorMessage($field) {
     switch ($field) {
         case FIRSTNAME_FIELDNAME:
             return "Моля попълнете името си!";
@@ -108,12 +108,14 @@ if (isset($_POST["submit"])) {
     foreach ($field_values as $field_name => $field_default_value) {
         $value = $_POST[$field_name] ?? $field_default_value;
 
-        if (empty($value)) {
-            $errors[] = empty_field_error_message($field_name);
+        // Empty field check
+        if (empty($value) && $field_name != PHOTO_FIELDNAME) {
+            $errors[] = emptyFieldErrorMessage($field_name);
         } else {
             $field_values[$field_name] = $value;
         }
 
+        // Additional field-specific checks
         switch ($field_name) {
             case BIRTHDATE_FIELDNAME:
                 if (!preg_match("/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}$/", $value)) {
@@ -126,24 +128,81 @@ if (isset($_POST["submit"])) {
                     }
                 }
                 break;
+
             case ACADEMIC_YEAR_FIELDNAME:
-                $yearInt = (int)$value;
-                if (!$yearInt) {
+                $year_int = (int)$value;
+                if (!$year_int) {
                     $errors[] = "Моля въведете цифра, съответстваща на академичната ви година!";
                 } else {
-                    $field_values[ACADEMIC_YEAR_FIELDNAME] = $yearInt;
+                    $field_values[ACADEMIC_YEAR_FIELDNAME] = $year_int;
                 }
                 break;
+
             case MAJORGROUP_FIELDNAME:
-                $groupInt = (int)$value;
-                if (!$groupInt) {
+                $group_int = (int)$value;
+                if (!$group_int) {
                     $errors[] = "Моля въведете цифра, съответстваща на вашата група!";
                 } else {
-                    $field_values[MAJORGROUP_FIELDNAME] = $groupInt;
+                    $field_values[MAJORGROUP_FIELDNAME] = $group_int;
                 }
                 break;
+
             case PHOTO_FIELDNAME:
-                // TODO
+                $target_dir = "uploads/";
+                $target_file = $target_dir . basename($_FILES[PHOTO_FIELDNAME]["name"]);
+                $image_file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+                $file_upload_error = $_FILES[PHOTO_FIELDNAME]["error"];
+
+                if ($file_upload_error == UPLOAD_ERR_NO_FILE) {
+                    $errors[] = emptyFieldErrorMessage(PHOTO_FIELDNAME);
+                    break;
+                }
+
+                if ($file_upload_error == UPLOAD_ERR_NO_TMP_DIR) {
+                    error_log("[!!] CRITICAL: Missing temp dir!");
+                    $errors[] = "Изникна ни грешка при качвнето на снимката, моля опитайте пак по-късно.";
+                    break;
+                }
+
+                if ($file_upload_error == UPLOAD_ERR_CANT_WRITE) {
+                    error_log("[!!] CRITICAL: Cannot write to disk!");
+                    $errors[] = "Изникна ни грешка при качвнето на снимката, моля опитайте пак по-късно.";
+                    break;
+                }
+
+                if ($file_upload_error == UPLOAD_ERR_PARTIAL) {
+                    $errors[] = "Прикаченият файл бе полу-качен. Моля оптатайте пак да го изпратите.";
+                    break;
+                }
+
+                if (!getimagesize($_FILES[PHOTO_FIELDNAME]["tmp_name"])) {
+                    $errors[] = "Прикаченият файл не е снимка!";
+                    break;
+                }
+
+                if ($_FILES[PHOTO_FIELDNAME]["size"] > SETTINGS["MAX_FILESIZE_BYTES"] || $file_upload_error == UPLOAD_ERR_FORM_SIZE || $file_upload_error == UPLOAD_ERR_INI_SIZE) {
+                    $errors[] = "Прикаченият файл е твърде голям! Приема се само до " . (SETTINGS["MAX_FILESIZE_BYTES"] / 1000) . " килобайта";
+                    break;
+                }
+
+                if (!in_array($image_file_type, SETTINGS["ALLOWED_PHOTO_FORMATS"])) {
+                    $errors[] = "Позволява се качването само на JPG, JPEG, PNG или GIF снимка.";
+                    break;
+                }
+
+                if ($file_upload_error == UPLOAD_ERR_OK) {
+
+                    // TODO: Recursively rename file if filename already exists.
+
+                    if (!move_uploaded_file($_FILES[PHOTO_FIELDNAME]["tmp_name"], $target_file)) {
+                        error_log("[!!] CRITICAL: Move uploaded file failed to move from {$_FILES[PHOTO_FIELDNAME]["tmp_name"]} to {$target_file}!");
+                        $errors[] = "Изникна ни грешка при качвнето на снимката, моля опитайте пак по-късно.";
+                        break;
+                    }
+
+                    $field_values[PHOTO_FIELDNAME] = $target_file;
+                }
+
                 break;
         }
     }
@@ -202,8 +261,7 @@ if (isset($_POST["submit"])) {
         $stmt->bindParam(":birth", $field_values[BIRTHDATE_FIELDNAME]);
         $stmt->bindParam(":zodiac", $field_values[ZODIAC_FIELDNAME]);
         $stmt->bindParam(":hyperlink", $field_values[LINK_FIELDNAME]);
-        $photo = "test.png"; // TODO
-        $stmt->bindParam(":photo", $photo);
+        $stmt->bindParam(":photo", $field_values[PHOTO_FIELDNAME]);
         $stmt->bindParam(":motivation", $field_values[MOTIVATION_FIELDNAME]);
 
         if (!$stmt->execute()) {
